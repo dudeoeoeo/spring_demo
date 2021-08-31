@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-BackendSpringApplication<backend_spring>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "mainClass": "com.docker_exam.backend_spring.BackendSpringApplication",
+            "projectName": "backend_spring",
+            "args": ""
+        }
+    ]
+}
