@@ -1,40 +1,29 @@
-version: "3"
-
+version: "3.7"
 services:
-
   database:
+    container_name: database
     image: mysql:8
-    environment:
-        MYSQL_DATABASE: spring_social
-        MYSQL_USER: plee
-        MYSQL_PASSWORD: plee
-        MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
     volumes:
-      - "./database/spring_db/:/var/lib/mysql"
+      - ./database/spring_db/:/var/lib/mysql
+    environment:
+      - MYSQL_DATABASE=database_name
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_ROOT_HOST=%
+    command: ['--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
     ports:
-      - "3309:3306"
+      - 3306:3306
     restart: always
-    container_name: plee_mysql
-    networks:
-      - backend-network
-
-  spring-boot:
-    build: ./backend_spring/
-      #context: ./backend_spring  ## 현재 폴더의 backend_spring 밑에 Dockerfile 실행
-      #dockerfile: Dockerfile
-    image: plee_auth
+    
+  application:
+    build: ./backend_spring
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://database:3306/database_name?testdbautoReconnect=true&failOverReadOnly=false&maxReconnects=10
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: password
     ports:
-      - "8080:8080"
-    container_name: plee_auth
-    restart: always
+      - 8080:8080
     depends_on:
       - database
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://plee_mysql:3309/spring_social?useSSL=false&serverTimezone=UTC&useLegacyDatetimeCode=false
-      SPRING_DATASOURCE_USERNAME: plee
-      SPRING_DATASOURCE_PASSWORD: plee
-    networks:
-      - backend-network
-
-networks:
-  backend-network:
+    links: 
+      - database:database
+    restart: always

@@ -49,6 +49,15 @@ public class UserController {
     	System.out.println("id: "+user.getBirth());
     	return "lombok test";
     }
+    
+    @GetMapping("/test")
+    public String test1() {
+    	User user = new User();
+    	user.setUser_id("id_test1");
+    	user.setPassword("12341234");
+    	user.setPhone("010-1211-7845");
+    	return "test1 »£√‚";
+    }
 /*
     @GetMapping("/user/{id}")
     public Optional read(@PathVariable Long id) {
