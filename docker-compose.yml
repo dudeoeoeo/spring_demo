@@ -1,60 +1,102 @@
-#version: "3.7"
-#services:
-#  database:
-#    container_name: database
-#    image: mysql:8
-#    volumes:
-#      - ./database/spring_db/:/var/lib/mysql
-#    environment:
-#      - MYSQL_DATABASE=database_name
-#      - MYSQL_ROOT_PASSWORD=password
-#      - MYSQL_ROOT_HOST=%
-#    command: ['--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
-#    ports:
-#      - 3306:3306
-#    restart: always
-#
-#  application:
-#    build: ./backend_spring
-#    environment:
-#      SPRING_DATASOURCE_URL: jdbc:mysql://database:3306/database_name?testdbautoReconnect=true&failOverReadOnly=false&maxReconnects=10
-#      SPRING_DATASOURCE_USERNAME: root
-#      SPRING_DATASOURCE_PASSWORD: password
-#    #ports:
-#    #  - 8084:8084
-#    depends_on:
-#      - database
-#    links:
-#      - database:database
-#    restart: always
+# version: "3.7"
+# services:
+#   database:
+#     container_name: database
+#     image: mysql:8 mysql:5.7
+#     volumes:
+#       - ./database/spring_db/:/var/lib/mysql
+#     environment:
+#       - MYSQL_DATABASE=database_name
+#       - MYSQL_ROOT_PASSWORD=password
+#       - MYSQL_ROOT_HOST=%
+#     command: ['--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
+#     ports:
+#       - 3306:3306
+#     restart: always
+    
+#   application:
+#     build: ./backend_spring
+#     environment:
+#       SPRING_DATASOURCE_URL: jdbc:mysql://database:3306/database_name?testdbautoReconnect=true&failOverReadOnly=false&maxReconnects=10
+#       SPRING_DATASOURCE_USERNAME: root
+#       SPRING_DATASOURCE_PASSWORD: password
+#     ports:
+#       - 8080:8080
+#     depends_on:
+#       - database
+#     links: 
+#       - database:database
+#     restart: always
+
 version: '3'
 
 services:
   mysql-standalone-container:
-    image: mysql:5.7
+    image: mysql:8
+    container_name: mysql_8_db
     environment:
       - MYSQL_ROOT_PASSWORD=admin123
       - MYSQL_DATABASE=test
       - MYSQL_USER=testuser
       - MYSQL_PASSWORD=testuser@123
+    command: ['--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
+    ports: 
+      - 3306:3306
     volumes:
       - /database/spring_db:/var/lib/mysql
+
   springboot-docker-compose-mysql-app-container:
-    image: springboot-docker-compose-mysql-app:1
+    image: spring_back:0.0.1  # springboot-docker-compose-mysql-app:1
+    container_name: spring_backend
     build:
       context: ./backend_spring/
       dockerfile: Dockerfile
     ports:
-    - 8084:8084
+    - 8080:8080
     depends_on:
       - mysql-standalone-container
-#    volumes:
-#      - /data/springboot-docker-compose-mysql-app
+    volumes:
+      - /backend_spring/:/tmp
   react:
     image: node:12-alpine
+    container_name: react_frontend
     command: sh -c "npm install && npm start"
     ports:
       - 3000:3000
     working_dir: /app
     volumes:
       - ./frontend_react:/app
+
+# version: '3'
+
+# services:
+#   mysql-standalone-container:
+#     image: mysql:8
+#     environment:
+#       - MYSQL_ROOT_PASSWORD=admin123
+#       - MYSQL_DATABASE=test
+#       - MYSQL_USER=testuser
+#       - MYSQL_PASSWORD=testuser@123
+    
+#     volumes:
+#       - /database/spring_db:/var/lib/mysql
+
+#   springboot-docker-compose-mysql-app-container:
+#     image: springboot-docker-compose-mysql-app:1
+#     build:
+#       context: ./backend_spring/
+#       dockerfile: Dockerfile
+#     ports:
+#     - 8080:8080
+#     depends_on:
+#       - mysql-standalone-container
+# #    volumes:
+# #      - /data/springboot-docker-compose-mysql-app
+#   react:
+#     image: node:12-alpine
+#     command: sh -c "npm install && npm start"
+#     ports:
+#       - 3000:3000
+#     working_dir: /app
+#     volumes:
+#       - ./frontend_react:/app
